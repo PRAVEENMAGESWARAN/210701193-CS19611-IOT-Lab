@@ -1,0 +1,49 @@
+const int TRIG_PIN = 13; // Arduino pin connected to Ultrasonic Sensor's TRIG pin
+const int ECHO_PIN = 12; // Arduino pin connected to Ultrasonic Sensor's ECHO pin
+const int LED_PINS[] = {11, 10, 9, 8}; // Arduino pins connected to LEDs
+const int NUM_LEDS = 4; // Number of LEDs
+
+// Define the distance thresholds for each LED
+const int DISTANCE_THRESHOLDS[] = {10, 20, 30, 40}; // Customize these values as needed
+
+// Variables will change
+float duration_us, distance_cm;
+
+void setup() {
+  Serial.begin(9600); // Initialize serial port
+  pinMode(TRIG_PIN, OUTPUT); // Set Arduino pin to output mode
+  pinMode(ECHO_PIN, INPUT);  // Set Arduino pin to input mode
+
+  // Set Arduino pins to output mode for each LED
+  for (int i = 0; i < NUM_LEDS; i++) {
+    pinMode(LED_PINS[i], OUTPUT);
+  }
+}
+
+void loop() {
+  // Generate 10-microsecond pulse to TRIG pin
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+
+  // Measure duration of pulse from ECHO pin
+  duration_us = pulseIn(ECHO_PIN, HIGH);
+  // Calculate the distance
+  distance_cm = 0.017 * duration_us;
+
+  // Control LEDs based on distance
+  for (int i = 0; i < NUM_LEDS; i++) {
+    if (distance_cm < DISTANCE_THRESHOLDS[i]) {
+      digitalWrite(LED_PINS[i], HIGH); // Turn on LED
+    } else {
+      digitalWrite(LED_PINS[i], LOW);  // Turn off LED
+    }
+  }
+
+  // Print the value to Serial Monitor
+  Serial.print("Distance: ");
+  Serial.print(distance_cm);
+  Serial.println(" cm");
+
+  delay(500);
+}
